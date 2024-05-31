@@ -1,19 +1,18 @@
 package pl.networkmanager.bilka.auth.entity;
 
-import lombok.Builder;
-import lombok.Data;
 
 import java.sql.Timestamp;
 
-@Data
-@Builder
+import lombok.Getter;
+
+@Getter
 public class AuthResponse {
     private final String timestamp;
     private final String message;
-    private Code code;
+    private final Code code;
 
     public AuthResponse(Code code) {
-        this.timestamp = new Timestamp(new Timestamp(System.currentTimeMillis()).getTime()).toString();
+        this.timestamp = String.valueOf(new Timestamp(System.currentTimeMillis()));
         this.message = code.getLabel();
         this.code = code;
     }
