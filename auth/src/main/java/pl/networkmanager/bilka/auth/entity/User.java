@@ -1,7 +1,7 @@
 package pl.networkmanager.bilka.auth.entity;
 
 import jakarta.persistence.*;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -12,21 +12,32 @@ import java.util.List;
 import java.util.UUID;
 
 @Setter
-@NoArgsConstructor
+@Table(name = "users")
 @Entity
 public class User implements UserDetails {
 
     @Id
     @GeneratedValue(generator = "users_id_seq", strategy = GenerationType.SEQUENCE)
     @SequenceGenerator(name = "users_id_seq", sequenceName = "users_id_seq", allocationSize = 1)
+    @Getter
     private long id;
+    @Getter
     private String uuid;
     private String login;
+    @Getter
     private String email;
     private String password;
+    @Getter
     @Enumerated(EnumType.STRING)
     private Role role;
+    @Column(name = "islock")
     private boolean isLock;
+    @Column(name = "isenabled")
+    private boolean isEnabled;
+
+    public User() {
+        generateUuid();
+    }
 
     public User(long id, String uuid, String login, String email, String password, Role role, boolean isLock, boolean isEnabled) {
         this.id = id;
@@ -41,7 +52,6 @@ public class User implements UserDetails {
         generateUuid();
     }
 
-    private boolean isEnabled;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -65,7 +75,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return isLock;
+        return !isLock;
     }
 
     @Override
