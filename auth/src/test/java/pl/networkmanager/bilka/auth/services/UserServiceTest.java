@@ -106,7 +106,7 @@ public class UserServiceTest {
         ResponseEntity<?> responseEntity = userService.login(mock(HttpServletResponse.class), authRequest);
 
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertTrue(responseEntity.getBody() instanceof UserRegisterDTO);
+        assertInstanceOf(UserRegisterDTO.class, responseEntity.getBody());
     }
 
     @Test
@@ -120,7 +120,7 @@ public class UserServiceTest {
         ResponseEntity<?> responseEntity = userService.login(mock(HttpServletResponse.class), authRequest);
 
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertTrue(responseEntity.getBody() instanceof AuthResponse);
+        assertInstanceOf(AuthResponse.class, responseEntity.getBody());
         assertEquals(Code.A2, ((AuthResponse) responseEntity.getBody()).getCode());
     }
 
