@@ -74,7 +74,7 @@ public class UserService {
         });
 
         userRepository.findUserByEmail(userRegisterDTO.email()).ifPresent(_ -> {
-            throw new UserExistingWithLogin("user with the given email already exists");
+            throw new UserExistingWithMail("user with the given email already exists");
         });
 
         User user = new User();
