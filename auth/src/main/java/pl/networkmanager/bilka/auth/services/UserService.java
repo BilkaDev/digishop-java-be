@@ -1,6 +1,8 @@
 package pl.networkmanager.bilka.auth.services;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,7 +13,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.networkmanager.bilka.auth.entity.*;
+import pl.networkmanager.bilka.auth.exceptions.UserExistingWithLogin;
+import pl.networkmanager.bilka.auth.exceptions.UserExistingWithMail;
 import pl.networkmanager.bilka.auth.repository.UserRepository;
+
+import java.util.Arrays;
 
 @Service
 @RequiredArgsConstructor
@@ -35,11 +41,42 @@ public class UserService {
         return jwtService.generateToken(username, exp);
     }
 
-    public void validateToken(String token) {
-        jwtService.validateToken(token);
+    public void validateToken(HttpServletRequest request, HttpServletResponse response) throws ExpiredJwtException, IllegalArgumentException {
+        String token = null;
+        String refresh = null;
+        if (request.getCookies() != null) {
+            for (Cookie value : Arrays.stream(request.getCookies()).toList()) {
+                if (value.getName().equals("Authorization")) {
+                    token = value.getValue();
+                } else if (value.getName().equals("refresh")) {
+                    refresh = value.getValue();
+                }
+            }
+        } else {
+            throw new IllegalArgumentException("Token can't be null");
+        }
+        try {
+            jwtService.validateToken(token);
+        } catch (IllegalArgumentException | ExpiredJwtException e) {
+            jwtService.validateToken(refresh);
+            Cookie refreshCokkie = cookieService.generateCookie("refresh", jwtService.refreshToken(refresh, REFRESH_EXP), REFRESH_EXP);
+            Cookie cookie = cookieService.generateCookie("Authorization", jwtService.refreshToken(refresh, EXP), EXP);
+            response.addCookie(cookie);
+            response.addCookie(refreshCokkie);
+        }
+
     }
 
-    public void register(UserRegisterDTO userRegisterDTO) {
+
+    public void register(UserRegisterDTO userRegisterDTO) throws UserExistingWithLogin, UserExistingWithMail {
+        userRepository.findUserByLogin(userRegisterDTO.login()).ifPresent(_ -> {
+            throw new UserExistingWithLogin("user with the given name already exists");
+        });
+
+        userRepository.findUserByEmail(userRegisterDTO.email()).ifPresent(_ -> {
+            throw new UserExistingWithLogin("user with the given email already exists");
+        });
+
         User user = new User();
         user.setLogin(userRegisterDTO.login());
         user.setPassword(userRegisterDTO.password());
