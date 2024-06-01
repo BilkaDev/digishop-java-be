@@ -4,7 +4,7 @@ import jakarta.servlet.http.Cookie;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CookieService {
+class CookieService {
     public Cookie generateCookie(final String name, final String value, int exp) {
         Cookie cookie = new Cookie(name, value);
         cookie.setPath("/");
