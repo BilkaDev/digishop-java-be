@@ -77,7 +77,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                         if (response.getStatusCode() == HttpStatus.OK) {
                             List<String> cookiesList = response.getHeaders().get(HttpHeaders.SET_COOKIE);
                             if (cookiesList != null) {
-                                List<java.net.HttpCookie> httpCookie = java.net.HttpCookie.parse(cookiesList.get(0));
+                                List<java.net.HttpCookie> httpCookie = java.net.HttpCookie.parse(cookiesList.getFirst());
                                 for (java.net.HttpCookie cookie : httpCookie) {
                                     exchange.getResponse().getCookies().add(cookie.getName(),
                                             ResponseCookie.from(cookie.getName(), cookie.getValue())

@@ -34,9 +34,15 @@ public class AuthController {
         return ResponseEntity.ok(new AuthResponse(Code.SUCCESS));
     }
 
+
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseEntity<?> login(@RequestBody User user, HttpServletResponse response) {
         return userService.login(response, user);
+    }
+
+    @RequestMapping(path = "/auto-login", method = RequestMethod.GET)
+    public ResponseEntity<?> autoLogin(HttpServletRequest request, HttpServletResponse response) {
+        return userService.loginByToken(request, response);
     }
 
     @RequestMapping(value = "/validate", method = RequestMethod.GET)
@@ -48,6 +54,11 @@ public class AuthController {
         } catch (IllegalArgumentException | ExpiredJwtException e) {
             return ResponseEntity.status(401).body(new AuthResponse(Code.A3));
         }
+    }
+
+    @RequestMapping(path = "/logged-in", method = RequestMethod.GET)
+    public ResponseEntity<?> loggedIn(HttpServletRequest request, HttpServletResponse response) {
+        return userService.loggedIn(request, response);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
