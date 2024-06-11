@@ -4,6 +4,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -14,8 +15,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.networkmanager.bilka.auth.entity.*;
+import pl.networkmanager.bilka.auth.exceptions.UserDontExistException;
 import pl.networkmanager.bilka.auth.exceptions.UserExistingWithLogin;
 import pl.networkmanager.bilka.auth.exceptions.UserExistingWithMail;
+import pl.networkmanager.bilka.auth.repository.ResetOperationsRepository;
 import pl.networkmanager.bilka.auth.repository.UserRepository;
 
 import java.util.Arrays;
@@ -28,6 +31,9 @@ public class UserService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final CookieService cookieService;
+    private final EmailService emailService;
+    private final ResetOperationService resetOperationService;
+    private final ResetOperationsRepository resetOperationsRepository;
     @Value("${jwt.exp}")
     private int EXP;
     @Value("${jwt.refreshExp}")
@@ -79,6 +85,7 @@ public class UserService {
         });
 
         User user = new User();
+        user.setLock(true);
         user.setLogin(userRegisterDTO.login());
         user.setPassword(userRegisterDTO.password());
         user.setEmail(userRegisterDTO.email());
@@ -89,10 +96,11 @@ public class UserService {
         }
 
         saveUser(user);
+        emailService.sendActivationEmail(user);
     }
 
     public ResponseEntity<?> login(HttpServletResponse response, User authRequest) {
-        User user = userRepository.findUserByLogin(authRequest.getUsername()).orElse(null);
+        User user = userRepository.findUserByLoginAndLockAndEnabled(authRequest.getUsername()).orElse(null);
         if (user != null) {
             Authentication authenticate = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
@@ -151,5 +159,42 @@ public class UserService {
         } catch (ExpiredJwtException | IllegalArgumentException e) {
             return ResponseEntity.ok(new LoginResponse(false));
         }
+    }
+
+    public void activateUser(String uid) throws UserDontExistException {
+        User user = userRepository.findUserByUuid(uid).orElse(null);
+        if (user != null) {
+            user.setLock(false);
+            userRepository.save(user);
+            return;
+        }
+        throw new UserDontExistException("User with the given uuid doesn't exist");
+    }
+
+    public void recoverPassword(String email) throws UserDontExistException {
+        User user = userRepository.findUserByEmail(email).orElse(null);
+        if (user != null) {
+            ResetOperations resetOperation = resetOperationService.initResetOperation(user);
+            emailService.sendResetPasswordRecovery(user, resetOperation.getUid());
+            return;
+        }
+        throw new UserDontExistException("User with the given email doesn't exist");
+    }
+
+    @Transactional
+    public void resetPassword(ChangePasswordData changePasswordData) throws UserDontExistException {
+        ResetOperations resetOperations = resetOperationsRepository.findByUid(changePasswordData.getUid()).orElse(null);
+        if (resetOperations != null) {
+            User user = userRepository.findUserByUuid(
+                    resetOperations.getUser().getUuid()).orElse(null);
+            if (user != null) {
+                user.setPassword(changePasswordData.getPassword());
+                saveUser(user);
+                resetOperationService.endOperation(resetOperations.getUid());
+                return;
+            }
+        }
+        throw new UserDontExistException("User with the given uuid doesn't exist");
+
     }
 }

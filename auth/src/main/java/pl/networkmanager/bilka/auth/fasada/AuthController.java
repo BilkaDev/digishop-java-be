@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import pl.networkmanager.bilka.auth.entity.*;
+import pl.networkmanager.bilka.auth.exceptions.UserDontExistException;
 import pl.networkmanager.bilka.auth.exceptions.UserExistingWithLogin;
 import pl.networkmanager.bilka.auth.exceptions.UserExistingWithMail;
 import pl.networkmanager.bilka.auth.services.UserService;
@@ -60,6 +61,37 @@ public class AuthController {
     public ResponseEntity<?> loggedIn(HttpServletRequest request, HttpServletResponse response) {
         return userService.loggedIn(request, response);
     }
+
+    @RequestMapping(path = "/activate", method = RequestMethod.GET)
+    public ResponseEntity<?> activate(@RequestParam String uid) {
+        try {
+            userService.activateUser(uid);
+            return ResponseEntity.ok(new AuthResponse(Code.SUCCESS));
+        } catch (UserDontExistException e) {
+            return ResponseEntity.status(401).body(new AuthResponse(Code.A6));
+        }
+    }
+
+    @RequestMapping(path = "/reset-password", method = RequestMethod.POST)
+    public ResponseEntity<AuthResponse> sendMailRecovery(@RequestBody ResetPasswordDTO resetPasswordDTO) {
+        try {
+            userService.recoverPassword(resetPasswordDTO.email());
+            return ResponseEntity.ok(new AuthResponse(Code.SUCCESS));
+        } catch (UserDontExistException e) {
+            return ResponseEntity.status(401).body(new AuthResponse(Code.A6));
+        }
+    }
+
+    @RequestMapping(path = "/reset-password", method = RequestMethod.PATCH)
+    public ResponseEntity<AuthResponse> recoveryMail(@RequestBody ChangePasswordData changePasswordData) {
+        try {
+            userService.resetPassword(changePasswordData);
+            return ResponseEntity.ok(new AuthResponse(Code.SUCCESS));
+        } catch (UserDontExistException e) {
+            return ResponseEntity.status(401).body(new AuthResponse(Code.A6));
+        }
+    }
+
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
