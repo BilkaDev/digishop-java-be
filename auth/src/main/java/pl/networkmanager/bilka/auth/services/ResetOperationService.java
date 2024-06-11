@@ -46,7 +46,7 @@ public class ResetOperationService {
     protected void deleteExpireOperation() {
         List<ResetOperations> resetOperations = resetOperationsRepository.findExpiredOperations();
         log.info("Find {} expired operations to delete", resetOperations.size());
-        if (resetOperations != null && !resetOperations.isEmpty()) {
+        if (!resetOperations.isEmpty()) {
             resetOperationsRepository.deleteAll(resetOperations);
         }
     }
