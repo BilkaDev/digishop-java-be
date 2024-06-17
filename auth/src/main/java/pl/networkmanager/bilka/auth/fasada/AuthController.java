@@ -92,6 +92,11 @@ public class AuthController {
         }
     }
 
+    @RequestMapping(path = "/logout", method = RequestMethod.GET)
+    public ResponseEntity<?> logout(HttpServletResponse response, HttpServletRequest request) {
+        return userService.logout(request, response);
+    }
+
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)

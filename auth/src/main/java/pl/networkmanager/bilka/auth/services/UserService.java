@@ -86,14 +86,12 @@ public class UserService {
 
         User user = new User();
         user.setLock(true);
+        user.setEnabled(false);
         user.setLogin(userRegisterDTO.login());
         user.setPassword(userRegisterDTO.password());
         user.setEmail(userRegisterDTO.email());
-        if (userRegisterDTO.role() != null) {
-            user.setRole(userRegisterDTO.role());
-        } else {
-            user.setRole(Role.USER);
-        }
+        user.setRole(Role.USER);
+
 
         saveUser(user);
         emailService.sendActivationEmail(user);
@@ -120,9 +118,9 @@ public class UserService {
                                 .build()
                 );
             }
-            return ResponseEntity.ok(new AuthResponse(Code.A1));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse(Code.A1));
         }
-        return ResponseEntity.ok(new AuthResponse(Code.A2));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse(Code.A2));
     }
 
     public ResponseEntity<?> loginByToken(HttpServletRequest request, HttpServletResponse response) {
@@ -165,6 +163,7 @@ public class UserService {
         User user = userRepository.findUserByUuid(uid).orElse(null);
         if (user != null) {
             user.setLock(false);
+            user.setEnabled(true);
             userRepository.save(user);
             return;
         }
@@ -195,6 +194,17 @@ public class UserService {
             }
         }
         throw new UserDontExistException("User with the given uuid doesn't exist");
-
     }
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response){
+        Cookie cookie = cookieService.removeCookie(request.getCookies(),"Authorization");
+        if (cookie != null){
+            response.addCookie(cookie);
+        }
+        cookie = cookieService.removeCookie(request.getCookies(),"refresh");
+        if (cookie != null){
+            response.addCookie(cookie);
+        }
+        return  ResponseEntity.ok(new AuthResponse(Code.SUCCESS));
+    }
+
 }

@@ -24,7 +24,10 @@ public class UserConfiguration {
                         "/api/v1/auth/login",
                         "/api/v1/auth/validate",
                         "/api/v1/auth/reset-password",
-                        "/api/v1/auth/activate"
+                        "/api/v1/auth/activate",
+                        "/api/v1/auth/auto-login",
+                        "/api/v1/auth/logged-in",
+                        "/api/v1/auth/logout"
                 ).permitAll()
                 .and()
                 .build();
