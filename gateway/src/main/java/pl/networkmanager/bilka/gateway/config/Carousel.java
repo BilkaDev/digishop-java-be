@@ -4,6 +4,7 @@ package pl.networkmanager.bilka.gateway.config;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
 import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,34 +15,42 @@ public class Carousel {
     List<InstanceInfo> instances = new ArrayList<>();
     int currentIndex = 0;
 
-    public Carousel(EurekaClient eurekaClient){
+    public Carousel(EurekaClient eurekaClient) {
         this.eurekaClient = eurekaClient;
-        initAuthCarousel();
+        try {
+            initAuthCarousel();
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
         events();
     }
 
-    public String getUriAuth(){
+    public String getUriAuth() {
         StringBuilder stringBuilder = new StringBuilder();
         InstanceInfo instance = instances.get(currentIndex);
         stringBuilder.append(instance.getIPAddr()).append(":").append(instance.getPort());
-        if (instances.size()-1 == currentIndex){
+        if (instances.size() - 1 == currentIndex) {
             currentIndex = 0;
-        }else {
+        } else {
             currentIndex++;
         }
         return stringBuilder.toString();
     }
 
-    private void events(){
+    private void events() {
         eurekaClient.registerEventListener(eurekaEvent -> {
             initAuthCarousel();
         });
         eurekaClient.unregisterEventListener(eurekaEvent -> {
-            initAuthCarousel();
+            try {
+                initAuthCarousel();
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            }
         });
     }
 
-    private void initAuthCarousel() {
+    private void initAuthCarousel() throws NullPointerException {
         instances = eurekaClient.getApplication("AUTH-SERVICE").getInstances();
     }
 }
