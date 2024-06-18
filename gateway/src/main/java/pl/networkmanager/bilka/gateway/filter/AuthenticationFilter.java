@@ -45,7 +45,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                             .append("\"timestamp\": \"")
                             .append(new Timestamp(System.currentTimeMillis()))
                             .append("\",\n")
-                            .append("\"message\": \"missing authroization header\",\n")
+                            .append("\"messages\": [\"missing authroization header\"],\n")
                             .append("\"code\": \"A3\"\n")
                             .append("}");
 

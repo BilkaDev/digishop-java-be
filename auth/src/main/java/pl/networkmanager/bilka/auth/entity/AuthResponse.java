@@ -1,19 +1,12 @@
 package pl.networkmanager.bilka.auth.entity;
 
 
-import java.sql.Timestamp;
+import pl.networkmanager.bilka.errorhandler.entity.ErrorResponse;
 
-import lombok.Getter;
+import java.util.List;
 
-@Getter
-public class AuthResponse {
-    private final String timestamp;
-    private final String message;
-    private final Code code;
-
+public class AuthResponse extends ErrorResponse {
     public AuthResponse(Code code) {
-        this.timestamp = String.valueOf(new Timestamp(System.currentTimeMillis()));
-        this.message = code.getLabel();
-        this.code = code;
+        super(List.of(code.getLabel()), code.name());
     }
 }

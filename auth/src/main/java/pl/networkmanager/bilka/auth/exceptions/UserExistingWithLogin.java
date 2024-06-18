@@ -1,15 +1,16 @@
 package pl.networkmanager.bilka.auth.exceptions;
 
-public class UserExistingWithLogin extends RuntimeException {
+import org.springframework.http.HttpStatus;
+import pl.networkmanager.bilka.auth.entity.Code;
+import pl.networkmanager.bilka.errorhandler.entity.CustomError;
+
+public class UserExistingWithLogin extends CustomError {
+    @Override
+    public HttpStatus getStatusCode() {
+        return HttpStatus.BAD_REQUEST;
+    }
+
     public UserExistingWithLogin(String message) {
-        super(message);
-    }
-
-    public UserExistingWithLogin(Throwable cause) {
-        super(cause);
-    }
-
-    public UserExistingWithLogin(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+        super(message, Code.A4.name());
     }
 }
