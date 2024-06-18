@@ -1,12 +1,13 @@
 package pl.networkmanager.bilka.gateway.filter;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
+import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import pl.networkmanager.bilka.gateway.config.Carousel;
 import pl.networkmanager.bilka.gateway.utils.JwtUtils;
 import reactor.core.publisher.Flux;
@@ -16,6 +17,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 @Component
+@Slf4j
 public class AuthenticationFilter extends AbstractGatewayFilterFactory<AuthenticationFilter.Config> {
 
     private final RouteValidator validator;
@@ -36,6 +38,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
     @Override
     public GatewayFilter apply(Config config) {
         return ((exchange, chain) -> {
+            log.info("--START GatewayFilter--");
             if (validator.isSecure.test(exchange.getRequest())) {
                 if (!exchange.getRequest().getCookies().containsKey(HttpHeaders.AUTHORIZATION) && !exchange.getRequest().getCookies().containsKey("refresh")) {
                     exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
@@ -56,8 +59,10 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 
                 HttpCookie authCookie = exchange.getRequest().getCookies().get(HttpHeaders.AUTHORIZATION).get(0);
                 HttpCookie refreshCookie = exchange.getRequest().getCookies().get("refresh").get(0);
+                log.info("--START validate token--");
                 try {
                     if (activeProfile.equals("test")) {
+                        log.debug("Init self auth methods (only for test profile)");
                         jwtUtil.validateToken(authCookie.getValue());
                     } else {
                         String cookies = new StringBuilder()
@@ -89,12 +94,16 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                                                     .build());
                                 }
                             }
+                            log.info("Successful login");
                         }
                     }
                 } catch (Exception e) {
+                    log.warn("Cannt login bad token");
                     exchange.getResponse().writeWith(Flux.just(new DefaultDataBufferFactory().wrap(e.getMessage().getBytes())));
                 }
             }
+            log.info("--END validate token--");
+            log.info("--END GatewayFilter--");
             return chain.filter(exchange);
         });
     }

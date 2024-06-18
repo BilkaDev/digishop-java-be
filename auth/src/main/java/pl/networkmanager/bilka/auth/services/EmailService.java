@@ -3,6 +3,7 @@ package pl.networkmanager.bilka.auth.services;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EmailService {
     private final EmailConfiguration emailConfiguration;
 
@@ -25,23 +27,29 @@ public class EmailService {
     Resource recoverTemplate;
 
     public void sendActivationEmail(User user) {
+        log.info("--START sendActivationEmail");
         try {
             String html = Files.toString(activeTemplate.getFile(), Charsets.UTF_8);
             html = html.replace("https://google.com", frontendUrl + "/activate/" + user.getUuid());
             emailConfiguration.sendMail(user.getEmail(), html, "Activate your account", true);
 
         } catch (IOException e) {
+            log.info("Can't send mail");
             throw new RuntimeException(e);
         }
+        log.info("--END sendActivationEmail");
     }
 
     public void sendResetPasswordRecovery(User user, String uid) {
-        try{
+        try {
+            log.info("--START sendResetPasswordRecovery");
             String html = Files.toString(recoverTemplate.getFile(), Charsets.UTF_8);
             html = html.replace("https://google.com", frontendUrl + "/reset-password/" + uid);
             emailConfiguration.sendMail(user.getEmail(), html, "Reset your password", true);
         } catch (IOException e) {
+            log.info("Can't send mail");
             throw new RuntimeException(e);
         }
+        log.info("--END sendResetPasswordRecovery");
     }
 }
