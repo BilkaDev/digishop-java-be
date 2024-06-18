@@ -19,7 +19,8 @@ public class AuthController {
     private final UserService userService;
 
     @RequestMapping(path = "/register", method = RequestMethod.POST)
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody UserRegisterDTO user) throws UserDontExistException, UserExistingWithMail {
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody UserRegisterDTO user)
+            throws UserDontExistException, UserExistingWithMail {
         userService.register(user);
         return ResponseEntity.ok(new AuthResponse(Code.SUCCESS));
     }
@@ -47,12 +48,13 @@ public class AuthController {
     }
 
     @RequestMapping(path = "/logged-in", method = RequestMethod.GET)
-    public ResponseEntity<?> loggedIn(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<LoginResponse> loggedIn(HttpServletRequest request, HttpServletResponse response) {
         return userService.loggedIn(request, response);
     }
 
     @RequestMapping(path = "/activate", method = RequestMethod.GET)
-    public ResponseEntity<?> activate(@RequestParam String uid) throws UserDontExistException {
+    public ResponseEntity<AuthResponse> activate(@RequestParam String uid)
+            throws UserDontExistException {
         userService.activateUser(uid);
         return ResponseEntity.ok(new AuthResponse(Code.SUCCESS));
     }
