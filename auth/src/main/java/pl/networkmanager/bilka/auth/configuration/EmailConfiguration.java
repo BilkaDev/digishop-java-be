@@ -1,0 +1,73 @@
+package pl.networkmanager.bilka.auth.configuration;
+
+import jakarta.mail.*;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.Properties;
+
+@Configuration
+public class EmailConfiguration {
+    private final String email;
+    private final String password;
+    private Authenticator auth;
+    private Session session;
+    private Properties properties;
+
+    public EmailConfiguration(@Value("${notification.mail}") String email, @Value("${notification.password}") String password) {
+        this.email = email;
+        this.password = password;
+        config();
+    }
+
+    private void config() {
+        String smtpHost = "smtp.gmail.com";
+        int port = 587;
+
+        properties = new Properties();
+        properties.put("mail.smtp.auth", "true");
+        properties.put("mail.smtp.starttls.enable", "true");
+        properties.put("mail.smtp.host", smtpHost);
+        properties.put("mail.smtp.port", port);
+        session = Session.getInstance(properties, auth);
+
+        this.auth = new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(email, password);
+            }
+        };
+    }
+
+    public void refreshSession() {
+        session = Session.getInstance(properties, auth);
+    }
+
+    public void sendMail(String recipientEmail, String content, String subject, boolean onCreate) {
+        if (session == null) {
+            refreshSession();
+        }
+        try {
+            MimeMessage message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(email));
+            message.setRecipients(MimeMessage.RecipientType.TO, InternetAddress.parse(recipientEmail));
+            message.setSubject(subject);
+            MimeBodyPart mimeBodyPart = new MimeBodyPart();
+            mimeBodyPart.setContent(content, "text/html; charset=utf-8");
+            Multipart multipart = new MimeMultipart();
+            multipart.addBodyPart(mimeBodyPart);
+            message.setContent(multipart);
+            Transport.send(message);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            if (onCreate) {
+                refreshSession();
+                sendMail(recipientEmail, content, subject, false);
+            }
+        }
+    }
+}
