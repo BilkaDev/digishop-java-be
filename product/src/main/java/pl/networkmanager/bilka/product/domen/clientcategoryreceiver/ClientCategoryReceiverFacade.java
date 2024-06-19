@@ -14,6 +14,6 @@ public class ClientCategoryReceiverFacade {
         var categories = adminCategoryCudFacade.findAll();
 
         return categories.stream()
-                .map(category -> CategoryDto.builder().uuid(category.shortId()).name(category.name()).build()).toList();
+                .map(category -> CategoryDto.builder().shortId(category.shortId()).name(category.name()).build()).toList();
     }
 }

@@ -34,7 +34,7 @@ class ClientCategoryReceiverFacadeTest {
 
         // then
         assertThat(categories).hasSize(1);
-        assertThat(categories.getFirst().uuid()).isNotNull().hasSize(12);
+        assertThat(categories.getFirst().shortId()).isNotNull().hasSize(12);
         assertThat(categories.getFirst().name()).isEqualTo("system");
     }
 
@@ -48,9 +48,9 @@ class ClientCategoryReceiverFacadeTest {
 
         // then
         assertThat(categoryDtos).hasSize(2);
-        assertThat(categoryDtos.get(0).uuid()).isNotNull().hasSize(12);
+        assertThat(categoryDtos.get(0).shortId()).isNotNull().hasSize(12);
         assertThat(categoryDtos.get(0).name()).isEqualTo("system");
-        assertThat(categoryDtos.get(1).uuid()).isNotNull().hasSize(12);
+        assertThat(categoryDtos.get(1).shortId()).isNotNull().hasSize(12);
         assertThat(categoryDtos.get(1).name()).isEqualTo("game");
     }
 }
