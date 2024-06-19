@@ -82,6 +82,12 @@
             <artifactId>assertj-core</artifactId>
             <version>3.25.3</version>
         </dependency>
+        <dependency>
+            <groupId>pl.networkmanager.bilka</groupId>
+            <artifactId>ErrorHandler</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
 
     </dependencies>
 

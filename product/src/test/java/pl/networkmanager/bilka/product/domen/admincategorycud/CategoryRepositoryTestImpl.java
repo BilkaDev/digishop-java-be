@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-public class CategoryRepositoryImpl implements CategoryRepository {
+public class CategoryRepositoryTestImpl implements CategoryRepository {
     Map<String, Category> databaseInMemory = new ConcurrentHashMap<>();
     static Long id = 0L;
 
@@ -37,7 +37,12 @@ public class CategoryRepositoryImpl implements CategoryRepository {
 
     @Override
     public Optional<Category> findByName(String name) {
-        return Optional.empty();
+        return databaseInMemory.values().stream().filter(v -> v.name().equals(name)).findFirst();
+    }
+
+    @Override
+    public Optional<Category> findByShortId(String shortId) {
+        return databaseInMemory.values().stream().filter(v -> v.shortId().equals(shortId)).findFirst();
     }
 
     @Override

@@ -1,7 +1,7 @@
 package pl.networkmanager.bilka.product.domen.clientcategoryreceiver;
 
 import pl.networkmanager.bilka.product.domen.admincategorycud.AdminCategoryCudFacade;
-import pl.networkmanager.bilka.product.domen.admincategorycud.CategoryRepositoryImpl;
+import pl.networkmanager.bilka.product.domen.admincategorycud.CategoryRepositoryTestImpl;
 import pl.networkmanager.bilka.product.domen.admincategorycud.dto.CategoryCreateDto;
 import pl.networkmanager.bilka.product.domen.admincategorycud.dto.CategoryDto;
 
@@ -13,7 +13,7 @@ public class AdminCategoryCudFacadeTestImpl extends AdminCategoryCudFacade {
     List<CategoryDto> categoryDtos = new ArrayList<>();
 
     public AdminCategoryCudFacadeTestImpl() {
-        super(new CategoryRepositoryImpl());
+        super(new CategoryRepositoryTestImpl());
     }
 
     @Override
