@@ -1,4 +1,4 @@
-package pl.networkmanager.bilka.product.domen.clientcategoryreceiver;
+package pl.networkmanager.bilka.product.domen.admincategorycud;
 
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -7,19 +7,37 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 public class CategoryRepositoryImpl implements CategoryRepository {
-    private List<Category> categories = List.of();
+    Map<String, Category> databaseInMemory = new ConcurrentHashMap<>();
+    static Long id = 0L;
 
-    public void setCategories(List<Category> categories) {
-        this.categories = categories;
+    @Override
+    public <S extends Category> S save(S entity) {
+
+        var newCategory = Category.builder()
+                .id(id++)
+                .name(entity.name())
+                .shortId(entity.shortId())
+                .build();
+
+        databaseInMemory.put(newCategory.id().toString(), newCategory);
+        return (S) newCategory;
     }
+
 
     @Override
     public List<Category> findAll() {
-        return categories;
+        return databaseInMemory.values().stream().toList();
+    }
+
+    @Override
+    public Optional<Category> findByName(String name) {
+        return Optional.empty();
     }
 
     @Override
@@ -103,11 +121,6 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     }
 
     @Override
-    public <S extends Category> S save(S entity) {
-        return null;
-    }
-
-    @Override
     public <S extends Category> List<S> saveAll(Iterable<S> entities) {
         return List.of();
     }
@@ -121,6 +134,7 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     public boolean existsById(Long aLong) {
         return false;
     }
+
 
     @Override
     public List<Category> findAllById(Iterable<Long> longs) {

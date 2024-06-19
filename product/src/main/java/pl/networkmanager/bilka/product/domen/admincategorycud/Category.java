@@ -1,4 +1,4 @@
-package pl.networkmanager.bilka.product.domen.clientcategoryreceiver;
+package pl.networkmanager.bilka.product.domen.admincategorycud;
 
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -11,7 +11,7 @@ record Category(
         @GeneratedValue(generator = "category_parameters_id_seq", strategy = GenerationType.SEQUENCE)
         @SequenceGenerator(name = "category_parameters_id_seq", sequenceName = "category_parameters_id_seq", allocationSize = 1)
         Long id,
-        String uuid,
+        String shortId,
         @Column(name = "category_name")
         String name
 ) {
