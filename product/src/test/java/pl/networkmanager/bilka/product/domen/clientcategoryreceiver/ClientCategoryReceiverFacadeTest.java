@@ -11,8 +11,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ClientCategoryReceiverFacadeTest {
 
-    private final AdminCategoryCudFacade adminCategoryCudFacade = new AdminCategoryCudFacadeImpl();
-    private final ClientCategoryReceiverFacade clientCategoryReceiverFacade = new ClientCategoryReceiverFacade(adminCategoryCudFacade);
+    private final AdminCategoryCudFacade adminCategoryCudFacade = new AdminCategoryCudFacadeTestImpl();
+    private final ClientCategoryReceiverFacade clientCategoryReceiverFacade = new ClientCategoryReceiverConfiguration()
+            .clientCategoryReceiverFacade(adminCategoryCudFacade);
 
     @Test
     public void should_return_empty_array_when_in_database_there_are_no_categories() {

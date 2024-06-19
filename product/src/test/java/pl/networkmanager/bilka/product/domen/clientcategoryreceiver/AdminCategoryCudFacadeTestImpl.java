@@ -9,10 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class AdminCategoryCudFacadeImpl extends AdminCategoryCudFacade {
+public class AdminCategoryCudFacadeTestImpl extends AdminCategoryCudFacade {
     List<CategoryDto> categoryDtos = new ArrayList<>();
 
-    public AdminCategoryCudFacadeImpl() {
+    public AdminCategoryCudFacadeTestImpl() {
         super(new CategoryRepositoryImpl());
     }
 
