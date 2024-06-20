@@ -32,7 +32,7 @@ public class ProductCrudFacade {
 
     @Transactional
     public void deleteProduct(String uid) {
-        productRepository.findProductByUid(uid).ifPresentOrElse(value -> {
+        productRepository.findProductByUuid(uid).ifPresentOrElse(value -> {
             value.setActivate(false);
             productRepository.save(value);
             for (String uuid : value.getImageUrls()) {
@@ -59,7 +59,7 @@ public class ProductCrudFacade {
     }
 
     public ProductDto getProductByUid(String uid) {
-        return productRepository.findProductByUid(uid)
+        return productRepository.findProductByUuid(uid)
                 .map(ProductMapper::mapFromProductToProductDto)
                 .orElseThrow(() -> new ObjectExistInDBException("Product dont exist in database"));
     }

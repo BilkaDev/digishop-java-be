@@ -30,7 +30,7 @@ public class ProductMapper {
         }
 
         return ProductDto.builder()
-                .uid(product.getUid())
+                .uid(product.getUuid())
                 .name(product.getName())
                 .mainDesc(product.getMainDesc())
                 .descHtml(product.getDescHtml())

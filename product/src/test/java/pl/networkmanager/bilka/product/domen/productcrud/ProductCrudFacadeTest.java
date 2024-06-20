@@ -35,7 +35,7 @@ class ProductCrudFacadeTest {
                 .imageUrls(new String[]{"uuid1111", "uuid2222"})
                 .categoryShortId("shortId")
                 .build();
-        when(categoryCrudFacade.findCategoryByShortId("shortId")).thenReturn(java.util.Optional.of(new Category(1L, "shortId", "name")));
+        when(categoryCrudFacade.findCategoryByShortId(anyString())).thenReturn(java.util.Optional.of(new Category(1L, "name")));
 
         // when
         productCrudFacade.createProduct(product);
@@ -74,11 +74,11 @@ class ProductCrudFacadeTest {
                 .imageUrls(new String[]{"uuid1111", "uuid2222"})
                 .categoryShortId("shortId")
                 .build();
-        when(categoryCrudFacade.findCategoryByShortId("shortId")).thenReturn(java.util.Optional.of(new Category(1L, "shortId", "name")));
+        when(categoryCrudFacade.findCategoryByShortId(anyString())).thenReturn(java.util.Optional.of(new Category(1L, "name")));
         productCrudFacade.createProduct(product);
 
         // when
-        productCrudFacade.deleteProduct(productRepository.findAll().getFirst().getUid());
+        productCrudFacade.deleteProduct(productRepository.findAll().getFirst().getUuid());
 
         // then
         assertThat(productRepository.findAll().getFirst().isActivate()).isFalse();
@@ -120,6 +120,7 @@ class ProductCrudFacadeTest {
         // when then
         assertThrows(ObjectExistInDBException.class, () -> productCrudFacade.getProductByUid(uid));
     }
+
     @Test
     public void should_return_product_when_product_exist() {
         // given
@@ -130,11 +131,12 @@ class ProductCrudFacadeTest {
                 .imageUrls(new String[]{"uuid1111", "uuid2222"})
                 .categoryShortId("shortId")
                 .build();
-        when(categoryCrudFacade.findCategoryByShortId("shortId")).thenReturn(java.util.Optional.of(new Category(1L, "shortId", "name")));
+
+        when(categoryCrudFacade.findCategoryByShortId(anyString())).thenReturn(java.util.Optional.of(new Category(1L, "name")));
         productCrudFacade.createProduct(product);
 
         // when
-        ProductDto productByUid = productCrudFacade.getProductByUid(productRepository.findAll().getFirst().getUid());
+        ProductDto productByUid = productCrudFacade.getProductByUid(productRepository.findAll().getFirst().getUuid());
 
         // then
         assertNotNull(productByUid);

@@ -17,8 +17,8 @@ public class ProductRepositoryImplTest implements ProductRepository {
     private Long id = 0L;
 
     @Override
-    public Optional<Product> findProductByUid(String uid) {
-        return inMemoryDatabase.values().stream().filter(v -> v.getUid().equals(uid)).findFirst();
+    public Optional<Product> findProductByUuid(String uid) {
+        return inMemoryDatabase.values().stream().filter(v -> v.getUuid().equals(uid)).findFirst();
     }
 
     @Override
