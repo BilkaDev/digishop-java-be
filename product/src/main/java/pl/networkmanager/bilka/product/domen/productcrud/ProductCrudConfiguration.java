@@ -4,7 +4,10 @@ import pl.networkmanager.bilka.product.domen.categorycrud.CategoryCrudFacade;
 
 public class ProductCrudConfiguration {
 
-    public ProductCrudFacade productCrudFacade(ProductRepository productRepository, CategoryCrudFacade categoryCrudFacade) {
-        return new ProductCrudFacade(productRepository, categoryCrudFacade);
+
+    public ProductCrudFacade createForTest(
+            ProductRepository productRepository, CategoryCrudFacade categoryCrudFacade, QueryManager queryManager, IImageClientFtp imageServerFtp) {
+
+        return new ProductCrudFacade(productRepository, categoryCrudFacade, queryManager, imageServerFtp);
     }
 }
