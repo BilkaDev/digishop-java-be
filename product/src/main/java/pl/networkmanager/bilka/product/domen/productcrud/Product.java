@@ -22,6 +22,7 @@ public class Product extends ProductBaseEntity {
     @ManyToOne
     @JoinColumn(name = "category_parameters")
     private Category category;
+    @Column(name = "product_name")
     private String name;
     private boolean activate;
     private String mainDesc;

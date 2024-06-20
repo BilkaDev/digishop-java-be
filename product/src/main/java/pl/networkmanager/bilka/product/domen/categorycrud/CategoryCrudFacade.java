@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import pl.networkmanager.bilka.product.domen.categorycrud.dto.CategoryCreateDto;
 import pl.networkmanager.bilka.product.domen.categorycrud.dto.CategoryDto;
 import pl.networkmanager.bilka.product.domen.common.exception.ObjectExistInDBException;
-import pl.networkmanager.bilka.product.domen.common.utils.ShortId;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,8 +13,7 @@ public class CategoryCrudFacade {
     private final CategoryRepository categoryRepository;
 
     public void create(CategoryCreateDto categoryCreateDto) throws ObjectExistInDBException {
-        String shortUuid = ShortId.generate();
-        Category category = Category.builder().name(categoryCreateDto.name()).shortId(shortUuid).build();
+        Category category = Category.builder().name(categoryCreateDto.name()).build();
 
         categoryRepository.findByName(categoryCreateDto.name()).ifPresent(_ -> {
             throw new ObjectExistInDBException("Category exists in database with this name");
@@ -25,7 +23,12 @@ public class CategoryCrudFacade {
 
     public List<CategoryDto> getCategories() {
         return categoryRepository.findAll().stream().map(category ->
-                CategoryDto.builder().shortId(category.shortId()).name(category.name()).build()).toList();
+                        CategoryDto
+                                .builder()
+                                .shortId(category.getShortId())
+                                .name(category.getName())
+                                .build())
+                .toList();
     }
 
     public Optional<Category> findCategoryByShortId(String shortId) {

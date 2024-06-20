@@ -28,8 +28,8 @@ class CategoryCrudFacadeTest {
         //then
         var categories = categoryRepository.findAll();
         assertThat(categories).hasSize(1);
-        assertThat(categories.getFirst().name()).isEqualTo("system");
-        assertThat(categories.getFirst().shortId()).hasSize(12);
+        assertThat(categories.getFirst().getName()).isEqualTo("system");
+        assertThat(categories.getFirst().getShortId()).hasSize(12);
     }
 
     @Test
@@ -83,7 +83,7 @@ class CategoryCrudFacadeTest {
         // then
         var categoryByShortId = categoryCrudFacade.findCategoryByShortId(category.shortId()).orElse(null);
         assertThat(categoryByShortId).isNotNull();
-        assertThat(categoryByShortId.name()).isEqualTo("exist-short-id");
+        assertThat(categoryByShortId.getName()).isEqualTo("exist-short-id");
     }
 
     @Test

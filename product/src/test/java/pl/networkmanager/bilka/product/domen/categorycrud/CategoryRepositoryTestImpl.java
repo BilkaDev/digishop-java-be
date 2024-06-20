@@ -21,11 +21,10 @@ public class CategoryRepositoryTestImpl implements CategoryRepository {
 
         var newCategory = Category.builder()
                 .id(id++)
-                .name(entity.name())
-                .shortId(entity.shortId())
+                .name(entity.getName())
                 .build();
 
-        databaseInMemory.put(newCategory.id().toString(), newCategory);
+        databaseInMemory.put(newCategory.getId().toString(), newCategory);
         return (S) newCategory;
     }
 
@@ -37,12 +36,12 @@ public class CategoryRepositoryTestImpl implements CategoryRepository {
 
     @Override
     public Optional<Category> findByName(String name) {
-        return databaseInMemory.values().stream().filter(v -> v.name().equals(name)).findFirst();
+        return databaseInMemory.values().stream().filter(v -> v.getName().equals(name)).findFirst();
     }
 
     @Override
     public Optional<Category> findByShortId(String shortId) {
-        return databaseInMemory.values().stream().filter(v -> v.shortId().equals(shortId)).findFirst();
+        return databaseInMemory.values().stream().filter(v -> v.getShortId().equals(shortId)).findFirst();
     }
 
     @Override
