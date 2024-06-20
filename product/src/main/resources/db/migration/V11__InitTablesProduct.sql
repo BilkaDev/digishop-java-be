@@ -8,6 +8,6 @@ CREATE TABLE products
     desc_html           TEXT           not null,
     price               decimal(12, 2) not null,
     image_urls          varchar[]      not null,
-    create_at           DATE,
+    created_at           DATE,
     category_parameters integer REFERENCES "category_parameters" (id)
 )
