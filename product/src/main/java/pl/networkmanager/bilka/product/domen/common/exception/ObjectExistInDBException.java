@@ -1,4 +1,4 @@
-package pl.networkmanager.bilka.product.domen.admincategorycud.exception;
+package pl.networkmanager.bilka.product.domen.common.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

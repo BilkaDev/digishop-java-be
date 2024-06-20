@@ -1,4 +1,4 @@
-package pl.networkmanager.bilka.product.domen.admincategorycud;
+package pl.networkmanager.bilka.product.domen.categorycrud;
 
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;

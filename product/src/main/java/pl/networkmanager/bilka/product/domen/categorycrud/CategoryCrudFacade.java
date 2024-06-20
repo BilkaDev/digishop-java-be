@@ -1,16 +1,16 @@
-package pl.networkmanager.bilka.product.domen.admincategorycud;
+package pl.networkmanager.bilka.product.domen.categorycrud;
 
 import lombok.AllArgsConstructor;
-import pl.networkmanager.bilka.product.domen.admincategorycud.dto.CategoryCreateDto;
-import pl.networkmanager.bilka.product.domen.admincategorycud.dto.CategoryDto;
-import pl.networkmanager.bilka.product.domen.admincategorycud.exception.ObjectExistInDBException;
-import pl.networkmanager.bilka.product.domen.utils.ShortId;
+import pl.networkmanager.bilka.product.domen.categorycrud.dto.CategoryCreateDto;
+import pl.networkmanager.bilka.product.domen.categorycrud.dto.CategoryDto;
+import pl.networkmanager.bilka.product.domen.common.exception.ObjectExistInDBException;
+import pl.networkmanager.bilka.product.domen.common.utils.ShortId;
 
 import java.util.List;
 import java.util.Optional;
 
 @AllArgsConstructor
-public class AdminCategoryCudFacade {
+public class CategoryCrudFacade {
     private final CategoryRepository categoryRepository;
 
     public void create(CategoryCreateDto categoryCreateDto) throws ObjectExistInDBException {
@@ -23,7 +23,7 @@ public class AdminCategoryCudFacade {
         categoryRepository.save(category);
     }
 
-    public List<CategoryDto> findAll() {
+    public List<CategoryDto> getCategories() {
         return categoryRepository.findAll().stream().map(category ->
                 CategoryDto.builder().shortId(category.shortId()).name(category.name()).build()).toList();
     }

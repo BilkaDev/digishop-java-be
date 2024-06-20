@@ -1,4 +1,4 @@
-package pl.networkmanager.bilka.product.domen.utils;
+package pl.networkmanager.bilka.product.domen.common.utils;
 
 import java.util.UUID;
 
