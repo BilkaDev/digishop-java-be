@@ -49,7 +49,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                             .append("\"timestamp\": \"")
                             .append(new Timestamp(System.currentTimeMillis()))
                             .append("\",\n")
-                            .append("\"message\": \"missing authorization token\",\n")
+                            .append("\"messages\": [\"missing authorization token\"],\n")
                             .append("\"code\": \"A3\"\n")
                             .append("}");
 

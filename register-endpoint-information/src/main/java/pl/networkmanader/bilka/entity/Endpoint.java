@@ -1,9 +1,14 @@
 package pl.networkmanader.bilka.entity;
 
+import java.util.Objects;
+
 public class Endpoint {
-    private final String url;
-    private final HttpMethod httpMethod;
-    private final Role role;
+    private String url;
+    private HttpMethod httpMethod;
+    private Role role;
+
+    public Endpoint() {
+    }
 
     public Endpoint(String url, HttpMethod httpMethod, Role role) {
         this.url = url;
@@ -21,5 +26,20 @@ public class Endpoint {
 
     public Role getRole() {
         return role;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Endpoint endpoint = (Endpoint) o;
+        return Objects.equals(url, endpoint.url) &&
+                httpMethod == endpoint.httpMethod &&
+                Objects.equals(role, endpoint.role);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(url, httpMethod, role);
     }
 }
