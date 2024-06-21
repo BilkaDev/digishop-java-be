@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,8 @@ import java.util.List;
 public class ProductCategoryCrudController {
     private static final Logger log = LoggerFactory.getLogger(ProductCategoryCrudController.class);
     private final ProductCrudFacade productCrudFacade;
+    @Value("${file-server.url}")
+    private String FILE_SERVER_URL;
 
     @GetMapping
     public ResponseEntity<List<ProductResponseDto>> getProducts(
@@ -62,7 +65,9 @@ public class ProductCategoryCrudController {
                         .mainDesc(v.mainDesc())
                         .descHtml(v.descHtml())
                         .price(v.price())
-                        .imageUrls(v.imageUrls())
+                        .imageUrls(v.imageUrls().stream().map(
+                                u -> FILE_SERVER_URL + "?uuid=" + u
+                        ).toList())
                         .build()
         ).toList();
         log.info("--END getProducts--");
@@ -82,7 +87,8 @@ public class ProductCategoryCrudController {
                 .mainDesc(product.mainDesc())
                 .descHtml(product.descHtml())
                 .price(product.price())
-                .imageUrls(product.imageUrls())
+                .imageUrls(product.imageUrls().stream()
+                        .map(u -> FILE_SERVER_URL + "?uuid=" + u).toList())
                 .build();
         log.info("--END getProductByUuid--");
         return ResponseEntity.ok(productResponseDto);

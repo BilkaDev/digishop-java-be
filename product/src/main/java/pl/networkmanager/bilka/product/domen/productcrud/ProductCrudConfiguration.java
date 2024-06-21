@@ -8,20 +8,6 @@ import pl.networkmanager.bilka.product.domen.categorycrud.CategoryCrudFacade;
 @Configuration
 public class ProductCrudConfiguration {
 
-    @Bean
-    public IImageClientFtp imageServerFtp() {
-        return new IImageClientFtp() {
-            @Override
-            public void activeImage(String uuid) {
-
-            }
-
-            @Override
-            public void deleteImage(String uuid) {
-
-            }
-        };
-    }
 
     @Bean
     public ProductCrudFacade productCrudFacade(

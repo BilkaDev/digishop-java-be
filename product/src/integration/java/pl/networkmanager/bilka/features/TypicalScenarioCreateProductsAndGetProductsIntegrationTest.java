@@ -2,9 +2,12 @@ package pl.networkmanager.bilka.features;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import pl.networkmanager.bilka.BaseIntegrationTest;
+import pl.networkmanager.bilka.product.domen.productcrud.IImageClientFtp;
 import pl.networkmanager.bilka.product.infrastructure.categorycrud.dto.CategoryCreateRequestDto;
 import pl.networkmanager.bilka.product.infrastructure.categorycrud.dto.CategoryResponseDto;
 import pl.networkmanager.bilka.product.infrastructure.productcrud.dto.CreateProductRequestDto;
@@ -14,11 +17,18 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class TypicalScenarioCreateProductsAndGetProductsIntegrationTest extends BaseIntegrationTest {
+    @Value("${file-server.url}")
+    private String fileServerUrl;
+
+    @MockBean
+    private IImageClientFtp imageServerFtp;
 
     @Test
     public void test1() throws Exception {
@@ -98,6 +108,7 @@ public class TypicalScenarioCreateProductsAndGetProductsIntegrationTest extends 
                     .andExpect(status().isCreated());
             // then
             createProduct.andExpect(status().isCreated());
+            verify(imageServerFtp).activeImage("uuid-img" + i);
         }
         //6. customer did GET/product page2 limit 10 and system replied 200 ok and 4 products and return header X-Total-Count=14.
         // given
@@ -118,6 +129,10 @@ public class TypicalScenarioCreateProductsAndGetProductsIntegrationTest extends 
         assertThat(products.getFirst().category().name()).isNotNull();
         assertThat(products.getFirst().isActive()).isEqualTo(true);
 
+        //6.1 customer did GET/product and products should contain url to get image from ftp-server.
+        assertThat(products.getFirst().imageUrls()).hasSize(1);
+        assertThat(products.getFirst().imageUrls().getFirst())
+                .contains(fileServerUrl + "?uuid=" + "uuid-img10");
 
         //7. customer did GET/category and system replied 200 ok and 2 category.
         // given
@@ -168,6 +183,7 @@ public class TypicalScenarioCreateProductsAndGetProductsIntegrationTest extends 
         mockMvc.perform(delete("/api/v1/product/" + productToDelete.uuid())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
+        verify(imageServerFtp).deleteImage(anyString());
         //11. customer did GET/product/uuid and the system replied 200 and product is not active.
         ResultActions resultActionGetOneNotActiveProduct = mockMvc.perform(get("/api/v1/product/" + productToDelete.uuid())
                         .contentType(MediaType.APPLICATION_JSON))
