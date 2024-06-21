@@ -7,6 +7,7 @@ import pl.networkmanager.bilka.product.domen.common.exception.ObjectExistInDBExc
 import pl.networkmanager.bilka.product.domen.productcrud.dto.CreateProductDto;
 import pl.networkmanager.bilka.product.domen.productcrud.dto.ProductDto;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,7 +90,10 @@ class ProductCrudFacadeTest {
     @Test
     void should_get_products() {
         String name = "testProduct";
-        String category = "testCategory";
+        Category category = Category.builder()
+                .id(1L)
+                .name("testCategory")
+                .build();
         Float priceMin = 10.0f;
         Float priceMax = 100.0f;
         Integer page = 1;
@@ -100,16 +104,26 @@ class ProductCrudFacadeTest {
         List<Product> mockProductList = new ArrayList<>();
         Product product = new Product();
         product.setName("testProduct");
+        product.setCategory(category);
+        product.setDescHtml("testProduct description");
+        product.setMainDesc("testProduct description");
+        product.setPrice(new BigDecimal("10.0"));
+        product.setActivate(true);
 
         mockProductList.add(product);
 
         when(queryManager.getProduct(anyString(), anyString(), anyFloat(), anyFloat(), anyInt(), anyInt(), anyString(), anyString()))
                 .thenReturn(mockProductList);
 
-        List<ProductDto> result = productCrudFacade.getProduct(name, category, priceMin, priceMax, page, limit, sort, order);
+        List<ProductDto> result = productCrudFacade
+                .getProduct(name, category.getName(), priceMin, priceMax, page, limit, sort, order);
 
         assertNotNull(result);
-        verify(queryManager, times(1)).getProduct(name, category, priceMin, priceMax, page, limit, sort, order);
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().createdAt()).isNotNull();
+//        assertThat(result.getFirst().isActive()).isTrue();
+        verify(queryManager, times(1)).getProduct(name, category.getName(), priceMin, priceMax, page, limit, sort, order);
+
     }
 
     @Test

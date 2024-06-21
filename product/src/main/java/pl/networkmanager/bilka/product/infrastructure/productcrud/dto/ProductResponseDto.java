@@ -1,4 +1,4 @@
-package pl.networkmanager.bilka.product.domen.productcrud.dto;
+package pl.networkmanager.bilka.product.infrastructure.productcrud.dto;
 
 import lombok.Builder;
 import pl.networkmanager.bilka.product.domen.categorycrud.dto.CategoryDto;
@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Builder
-public record ProductDto(
+public record ProductResponseDto(
         String uuid,
         LocalDate createdAt,
         String name,

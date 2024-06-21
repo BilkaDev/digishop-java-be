@@ -22,12 +22,12 @@ public class ProductCrudFacade {
         final Category category = categoryCrudFacade.findCategoryByShortId(product.categoryShortId()).orElseThrow(
                 () -> new ObjectExistInDBException("Category dont exist in database")
         );
-        for (String uuid : product.imageUrls()) {
-            imageServerFtp.activeImage(uuid);
-        }
         final Product newProduct = ProductMapper.mapFromCreateProductDtoToProduct(product, category);
         newProduct.setActivate(true);
         productRepository.save(newProduct);
+        for (String uuid : product.imageUrls()) {
+            imageServerFtp.activeImage(uuid);
+        }
     }
 
     @Transactional
@@ -58,10 +58,18 @@ public class ProductCrudFacade {
         return product.stream().map(ProductMapper::mapFromProductToProductDto).toList();
     }
 
+    public Long getCountActiveProduct(
+            String name,
+            String category,
+            Float price_min,
+            Float price_max
+    ) {
+        return queryManager.countActiveProducts(name, category, price_min, price_max);
+    }
+
     public ProductDto getProductByUid(String uid) {
         return productRepository.findProductByUuid(uid)
                 .map(ProductMapper::mapFromProductToProductDto)
                 .orElseThrow(() -> new ObjectExistInDBException("Product dont exist in database"));
     }
-
 }

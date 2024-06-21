@@ -62,4 +62,15 @@ public class QueryManager {
         predicates.add(criteriaBuilder.isTrue(root.get("activate")));
         return predicates;
     }
+
+    public Long countActiveProducts(String name, String category, Float price_min, Float price_max) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> query = criteriaBuilder.createQuery(Long.class);
+        Root<Product> root = query.from(Product.class);
+        List<Predicate> predicates = prepareQuery(name, category, price_min, price_max, criteriaBuilder, root);
+        query.select(criteriaBuilder.count(root)).where(predicates.toArray(new Predicate[0]));
+        return entityManager.createQuery(query).getSingleResult();
+
+
+    }
 }

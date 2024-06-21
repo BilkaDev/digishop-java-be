@@ -1,12 +1,12 @@
 package pl.networkmanager.bilka.product.domen.productcrud;
 
 import pl.networkmanager.bilka.product.domen.categorycrud.Category;
+import pl.networkmanager.bilka.product.domen.categorycrud.dto.CategoryDto;
 import pl.networkmanager.bilka.product.domen.productcrud.dto.CreateProductDto;
 import pl.networkmanager.bilka.product.domen.productcrud.dto.ProductDto;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 
 public class ProductMapper {
@@ -18,7 +18,7 @@ public class ProductMapper {
         product.setDescHtml(createProductDto.descHtml());
         product.setPrice(createProductDto.price());
         product.setImageUrls(
-                new HashSet<>(Arrays.asList(createProductDto.imageUrls()))
+                createProductDto.imageUrls()
         );
         return product;
     }
@@ -26,17 +26,24 @@ public class ProductMapper {
     static public ProductDto mapFromProductToProductDto(Product product) {
         List<String> images = new ArrayList<>();
         if (product.getImageUrls() != null) {
-            images.addAll(product.getImageUrls());
+            images.addAll(Arrays.stream(product.getImageUrls()).toList());
         }
 
+        CategoryDto categoryDto = CategoryDto.builder()
+                .shortId(product.getCategory().getShortId())
+                .name(product.getCategory().getName())
+                .build();
+
         return ProductDto.builder()
-                .uid(product.getUuid())
+                .uuid(product.getUuid())
+                .createdAt(product.getCreatedAt())
+                .isActive(product.isActivate())
                 .name(product.getName())
                 .mainDesc(product.getMainDesc())
                 .descHtml(product.getDescHtml())
                 .price(product.getPrice())
                 .imageUrls(images)
-                .category(product.getCategory())
+                .category(categoryDto)
                 .build();
     }
 }

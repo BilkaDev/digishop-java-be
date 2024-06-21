@@ -7,7 +7,6 @@ import lombok.Setter;
 import pl.networkmanager.bilka.product.domen.categorycrud.Category;
 
 import java.math.BigDecimal;
-import java.util.Set;
 
 @Table(name = "products")
 @Entity
@@ -28,6 +27,17 @@ public class Product extends ProductBaseEntity {
     private String mainDesc;
     private String descHtml;
     private BigDecimal price;
-    @ElementCollection
-    private Set<String> imageUrls;
+
+
+    public Product(long id, String uid, boolean activate, String name, String mainDesc, String descHtml, BigDecimal price, String[] imageUrls, Category category) {
+        super(imageUrls);
+        this.id = id;
+        this.category = category;
+        this.name = name;
+        this.activate = activate;
+        this.mainDesc = mainDesc;
+        this.descHtml = descHtml;
+        this.price = price;
+    }
+
 }

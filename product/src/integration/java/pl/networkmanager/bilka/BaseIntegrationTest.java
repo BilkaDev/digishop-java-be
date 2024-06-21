@@ -10,6 +10,8 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import pl.networkmanager.bilka.product.ProductApplication;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 @SpringBootTest(classes = {ProductApplication.class, IntegrationConfiguration.class})
 @Testcontainers
@@ -18,6 +20,9 @@ public class BaseIntegrationTest {
 
     @Autowired
     public MockMvc mockMvc;
+
+    @Autowired
+    public ObjectMapper objectMapper;
 
     @Container
     public static final PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:16");
