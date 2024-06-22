@@ -2,9 +2,9 @@ package pl.networkmanager.bilka.product.infrastructure.productcrud;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import pl.networkmanager.bilka.product.domen.productcrud.ProductCrudFacade;
 import pl.networkmanager.bilka.product.infrastructure.productcrud.dto.CreateProductRequestDto;
 import pl.networkmanager.bilka.product.infrastructure.productcrud.dto.ProductResponseDto;
@@ -13,7 +13,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-@Configuration
+@Component
 @Slf4j
 @RequiredArgsConstructor
 public class ProductMediator {
