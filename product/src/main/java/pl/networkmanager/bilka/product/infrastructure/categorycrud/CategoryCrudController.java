@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.networkmanager.bilka.product.domen.categorycrud.CategoryCrudFacade;
-import pl.networkmanager.bilka.product.domen.categorycrud.dto.CategoryCreateDto;
 import pl.networkmanager.bilka.product.infrastructure.categorycrud.dto.CategoryCreateRequestDto;
 import pl.networkmanager.bilka.product.infrastructure.categorycrud.dto.CategoryResponseDto;
 
@@ -23,10 +22,9 @@ public class CategoryCrudController {
     public ResponseEntity<List<CategoryResponseDto>> getCategories() {
         log.info("--START getCategories--");
         List<CategoryResponseDto> categories = categoryCrudFacade.getCategories()
-                .stream().map(v -> CategoryResponseDto.builder()
-                        .name(v.name())
-                        .shortId(v.shortId())
-                        .build()).toList();
+                .stream().map(
+                        CategoryMapper::mapFromCategoryToCategoryResponseDto
+                ).toList();
         log.info("--END getCategories--");
         return ResponseEntity.ok(categories);
     }
@@ -34,9 +32,8 @@ public class CategoryCrudController {
     @PostMapping
     public ResponseEntity<?> createCategory(@RequestBody @Valid CategoryCreateRequestDto categoryDto) {
         log.info("--START createCategory--");
-        categoryCrudFacade.create(CategoryCreateDto.builder()
-                .name(categoryDto.name())
-                .build()
+        categoryCrudFacade.create(
+                CategoryMapper.mapFromCategoryCreateRequestDtoToCategoryCreateDto(categoryDto)
         );
         log.info("--END createCategory--");
         return ResponseEntity.status(201).build();
