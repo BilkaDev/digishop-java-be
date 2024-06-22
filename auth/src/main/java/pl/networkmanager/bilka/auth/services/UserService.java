@@ -102,30 +102,19 @@ public class UserService {
 
     public ResponseEntity<?> login(HttpServletResponse response, User authRequest) {
         log.info("--START loginService");
-        User user = userRepository.findUserByLoginAndLockAndEnabled(authRequest.getUsername())
-                .orElseThrow(() -> new UserDontExistException(Code.A2));
-        Authentication authenticate = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+        User user = userRepository.findUserByLoginAndLockAndEnabled(authRequest.getUsername()).orElseThrow(() -> new UserDontExistException(Code.A2));
+        Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
         if (!authenticate.isAuthenticated()) {
             log.info("--STOP loginService");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse(Code.A1));
         }
 
-        Cookie refresh = cookieService.generateCookie(
-                "refresh", generateToken(authRequest.getUsername(), REFRESH_EXP), REFRESH_EXP);
-        Cookie cookie = cookieService.generateCookie(
-                "Authorization", generateToken(authRequest.getUsername(), EXP), EXP);
+        Cookie refresh = cookieService.generateCookie("refresh", generateToken(authRequest.getUsername(), REFRESH_EXP), REFRESH_EXP);
+        Cookie cookie = cookieService.generateCookie("Authorization", generateToken(authRequest.getUsername(), EXP), EXP);
         response.addCookie(refresh);
         response.addCookie(cookie);
         log.info("--STOP loginService");
-        return ResponseEntity.ok(
-                UserRegisterDTO
-                        .builder()
-                        .login(user.getUsername())
-                        .email(user.getEmail())
-                        .role(user.getRole())
-                        .build()
-        );
+        return ResponseEntity.ok(UserRegisterDTO.builder().login(user.getUsername()).email(user.getEmail()).role(user.getRole()).build());
     }
 
     public ResponseEntity<?> loginByToken(HttpServletRequest request, HttpServletResponse response) {
@@ -138,16 +127,8 @@ public class UserService {
                 }
             }
             String login = jwtService.getSubject(refresh);
-            User user = userRepository.findUserByLoginAndLockAndEnabled(login)
-                    .orElseThrow(() -> new UserDontExistException("User with the given login doesn't exist", Code.A1));
-            return ResponseEntity.ok(
-                    UserRegisterDTO
-                            .builder()
-                            .login(user.getUsername())
-                            .email(user.getEmail())
-                            .role(user.getRole())
-                            .build()
-            );
+            User user = userRepository.findUserByLoginAndLockAndEnabled(login).orElseThrow(() -> new UserDontExistException("User with the given login doesn't exist", Code.A1));
+            return ResponseEntity.ok(UserRegisterDTO.builder().login(user.getUsername()).email(user.getEmail()).role(user.getRole()).build());
         } catch (ExpiredJwtException | IllegalArgumentException e) {
             log.info("Can't login because token expired or is empty");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse(Code.A3));
@@ -164,26 +145,22 @@ public class UserService {
     }
 
     public void activateUser(String uid) throws UserDontExistException {
-        User user = userRepository.findUserByUuid(uid)
-                .orElseThrow(() -> new UserDontExistException("User with the given uuid doesn't exist"));
+        User user = userRepository.findUserByUuid(uid).orElseThrow(() -> new UserDontExistException("User with the given uuid doesn't exist"));
         user.setLock(false);
         user.setEnabled(true);
         userRepository.save(user);
     }
 
     public void recoverPassword(String email) throws UserDontExistException {
-        User user = userRepository.findUserByEmail(email)
-                .orElseThrow(() -> new UserDontExistException("User with the given email doesn't exist"));
+        User user = userRepository.findUserByEmail(email).orElseThrow(() -> new UserDontExistException("User with the given email doesn't exist"));
         ResetOperations resetOperation = resetOperationService.initResetOperation(user);
         emailService.sendResetPasswordRecovery(user, resetOperation.getUid());
     }
 
     @Transactional
     public void resetPassword(ChangePasswordData changePasswordData) throws UserDontExistException {
-        ResetOperations resetOperations = resetOperationsRepository.findByUid(changePasswordData.getUid())
-                .orElseThrow(() -> new UserDontExistException("User with the given uuid doesn't exist"));
-        User user = userRepository.findUserByUuid(resetOperations.getUser().getUuid())
-                .orElseThrow(() -> new UserDontExistException("User with the given uuid doesn't exist"));
+        ResetOperations resetOperations = resetOperationsRepository.findByUid(changePasswordData.getUid()).orElseThrow(() -> new UserDontExistException("User with the given uuid doesn't exist"));
+        User user = userRepository.findUserByUuid(resetOperations.getUser().getUuid()).orElseThrow(() -> new UserDontExistException("User with the given uuid doesn't exist"));
 
         user.setPassword(changePasswordData.getPassword());
         saveUser(user);
@@ -201,6 +178,30 @@ public class UserService {
             response.addCookie(cookie);
         }
         return ResponseEntity.ok(new AuthResponse(Code.SUCCESS));
+    }
+
+    public void authorize(HttpServletRequest request) throws UserDontExistException {
+        String token = null;
+        String refresh = null;
+        if (request.getCookies() != null) {
+            for (Cookie value : Arrays.stream(request.getCookies()).toList()) {
+                if (value.getName().equals("Authorization")) {
+                    token = value.getValue();
+                } else if (value.getName().equals("refresh")) {
+                    refresh = value.getValue();
+                }
+            }
+        } else {
+            log.info("Can't login because in token is empty");
+            throw new IllegalArgumentException("Token can't be null");
+        }
+        if (token != null && !token.isEmpty()) {
+            String subject = jwtService.getSubject(token);
+            userRepository.findUserByLoginAndLockAndEnabledAndIsAdmin(subject).orElseThrow(() -> new UserDontExistException("User not found"));
+        } else if (refresh != null && !refresh.isEmpty()) {
+            String subject = jwtService.getSubject(refresh);
+            userRepository.findUserByLoginAndLockAndEnabledAndIsAdmin(subject).orElseThrow(() -> new UserDontExistException("User not found"));
+        }
     }
 
 }

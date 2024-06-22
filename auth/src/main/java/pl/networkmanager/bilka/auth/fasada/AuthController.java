@@ -56,6 +56,20 @@ public class AuthController {
         }
     }
 
+    @RequestMapping(value = "/authorize", method = RequestMethod.GET)
+    public ResponseEntity<AuthResponse> authorize(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            log.info("--START AUTHORIZE");
+            userService.validateToken(request, response);
+            userService.authorize(request);
+            log.info("--END AUTHORIZE");
+            return ResponseEntity.ok(new AuthResponse(Code.PERMIT));
+        } catch (IllegalArgumentException | ExpiredJwtException e) {
+            log.info("Token is invalid or expired");
+            return ResponseEntity.status(401).body(new AuthResponse(Code.A3));
+        }
+    }
+
     @RequestMapping(path = "/logged-in", method = RequestMethod.GET)
     public ResponseEntity<LoginResponse> loggedIn(HttpServletRequest request, HttpServletResponse response) {
         log.info("--CHECK IF USER IS LOGGED IN");
