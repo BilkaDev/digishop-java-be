@@ -8,13 +8,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import pl.networkmanager.bilka.basket.domain.basketcrud.BasketCrudFacade;
-import pl.networkmanager.bilka.basket.domain.basketcrud.dto.BasketItemAddDto;
-import pl.networkmanager.bilka.basket.domain.basketcrud.dto.BasketItemDto;
 import pl.networkmanager.bilka.basket.domain.basketcrud.dto.BasketDto;
+import pl.networkmanager.bilka.basket.domain.basketcrud.dto.BasketItemDto;
 import pl.networkmanager.bilka.basket.infrastructure.dto.BasketItemAddRequestDto;
 import pl.networkmanager.bilka.basket.infrastructure.dto.ListBasketItemResponseDto;
+import pl.networkmanager.bilka.basket.infrastructure.producthttp.BasketMapper;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -62,11 +61,9 @@ public class BasketMediator {
                     Long sum = basketCrudFacade.sumBasketItems(basket);
                     httpHeaders.add("X-Total-Count", String.valueOf(sum));
                     List<BasketItemDto> basketItems = basketCrudFacade.getBasketItems(basket);
-                    listBasketItemResponseDto.set(ListBasketItemResponseDto.builder()
-                            .basketProducts(basketItems)
-                            .totalPrice(basketItems.stream()
-                                    .map(BasketItemDto::totalPrice).reduce(BigDecimal::add).orElse(null))
-                            .build());
+                    listBasketItemResponseDto.set(
+                            BasketMapper.fromListBasketItemDtoToBasketItemResponseDto(basketItems)
+                    );
                 }, () -> {
                     throw new NoBasketInfoException("No basket info in request");
                 });
@@ -80,10 +77,8 @@ public class BasketMediator {
             basket = basketCrudFacade.createBasket();
             response.addCookie(cookieService.generateCookie("basket", basket.uuid()));
         }
-        basketCrudFacade.addProductToBasket(basket, BasketItemAddDto.builder()
-                .product(basketItemAddRequestDto.product())
-                .quantity(basketItemAddRequestDto.quantity())
-                .build());
+        basketCrudFacade.addProductToBasket(
+                basket, BasketMapper.fromBasketItemRequestDtoToBasketItemAddDto(basketItemAddRequestDto));
         return basketCrudFacade.sumBasketItems(basket);
     }
 
