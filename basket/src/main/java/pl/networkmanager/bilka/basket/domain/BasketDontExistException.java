@@ -1,4 +1,4 @@
-package pl.networkmanager.bilka.basket.domain.basketcrud.repository;
+package pl.networkmanager.bilka.basket.domain;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
