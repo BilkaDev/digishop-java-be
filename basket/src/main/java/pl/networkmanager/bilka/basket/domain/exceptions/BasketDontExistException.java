@@ -1,4 +1,4 @@
-package pl.networkmanager.bilka.basket.domain;
+package pl.networkmanager.bilka.basket.domain.exceptions;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

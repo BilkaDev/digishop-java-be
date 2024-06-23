@@ -9,10 +9,10 @@ import pl.networkmanager.bilka.basket.domain.basketcrud.dto.BasketItemDto;
 import pl.networkmanager.bilka.basket.domain.basketcrud.entity.Basket;
 import pl.networkmanager.bilka.basket.domain.basketcrud.entity.BasketItems;
 import pl.networkmanager.bilka.basket.domain.basketcrud.entity.Product;
-import pl.networkmanager.bilka.basket.domain.BasketDontExistException;
+import pl.networkmanager.bilka.basket.domain.exceptions.BasketDontExistException;
 import pl.networkmanager.bilka.basket.domain.basketcrud.repository.BasketItemRepository;
 import pl.networkmanager.bilka.basket.domain.basketcrud.repository.BasketRepository;
-import pl.networkmanager.bilka.basket.domain.dto.BasketDto;
+import pl.networkmanager.bilka.basket.domain.basketcrud.dto.BasketDto;
 
 import java.math.BigDecimal;
 import java.net.URISyntaxException;

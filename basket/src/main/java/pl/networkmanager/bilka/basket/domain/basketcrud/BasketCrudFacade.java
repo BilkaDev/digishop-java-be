@@ -1,21 +1,21 @@
 package pl.networkmanager.bilka.basket.domain.basketcrud;
 
 import lombok.RequiredArgsConstructor;
+import pl.networkmanager.bilka.basket.domain.basketcrud.dto.BasketDto;
 import pl.networkmanager.bilka.basket.domain.basketcrud.dto.BasketItemAddDto;
 import pl.networkmanager.bilka.basket.domain.basketcrud.dto.BasketItemDto;
 import pl.networkmanager.bilka.basket.domain.basketcrud.entity.Basket;
 import pl.networkmanager.bilka.basket.domain.basketcrud.entity.BasketItems;
 import pl.networkmanager.bilka.basket.domain.basketcrud.entity.Product;
-import pl.networkmanager.bilka.basket.domain.BasketDontExistException;
 import pl.networkmanager.bilka.basket.domain.basketcrud.repository.BasketItemRepository;
 import pl.networkmanager.bilka.basket.domain.basketcrud.repository.BasketRepository;
-import pl.networkmanager.bilka.basket.domain.dto.BasketDto;
+import pl.networkmanager.bilka.basket.domain.exceptions.BasketDontExistException;
+import pl.networkmanager.bilka.basket.domain.exceptions.ProductDontExistsException;
 
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 
@@ -84,11 +84,12 @@ public class BasketCrudFacade {
                     basketItemRepository.save(basketItems1);
                 }, () -> {
                     basketItems.setBasket(basket);
-                    basketItems.setUuid(UUID.randomUUID().toString());
                     basketItems.setQuantity(basketItemAddDTO.quantity());
                     basketItems.setProduct(product.getUuid());
                     basketItemRepository.save(basketItems);
                 });
+            } else {
+                throw new ProductDontExistsException("Product not found");
             }
         } catch (URISyntaxException e) {
             throw new RuntimeException("Product not found");
