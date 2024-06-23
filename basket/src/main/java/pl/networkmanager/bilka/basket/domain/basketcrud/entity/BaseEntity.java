@@ -1,4 +1,4 @@
-package pl.networkmanager.bilka.basket.domain.entity;
+package pl.networkmanager.bilka.basket.domain.basketcrud.entity;
 
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;

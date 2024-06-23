@@ -1,9 +1,10 @@
-package pl.networkmanager.bilka.basket.domain.entity;
+package pl.networkmanager.bilka.basket.domain.basketcrud.entity;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Getter
@@ -19,4 +20,5 @@ public class Product {
     private boolean available;
     private LocalDate createdAt;
     private Category category;
+    private BigDecimal price;
 }
