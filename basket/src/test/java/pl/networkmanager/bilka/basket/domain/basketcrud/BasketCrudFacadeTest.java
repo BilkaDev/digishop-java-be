@@ -15,6 +15,7 @@ import pl.networkmanager.bilka.basket.domain.basketcrud.repository.BasketReposit
 import pl.networkmanager.bilka.basket.domain.dto.BasketDto;
 
 import java.math.BigDecimal;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -74,7 +75,7 @@ class BasketCrudFacadeTest {
     }
 
     @Test
-    void should_add_product_to_basket_successfully() {
+    void should_add_product_to_basket_successfully() throws URISyntaxException {
         String uuid = UUID.randomUUID().toString();
         Basket basket = new Basket();
         basket.setUuid(uuid);
@@ -108,7 +109,7 @@ class BasketCrudFacadeTest {
     }
 
     @Test
-    void should_return_basket_items_when_valid_basket_is_given() {
+    void should_return_basket_items_when_valid_basket_is_given() throws URISyntaxException {
         String uuid = UUID.randomUUID().toString();
         Basket basket = new Basket();
         basket.setUuid(uuid);

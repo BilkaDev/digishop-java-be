@@ -8,11 +8,6 @@ import pl.networkmanager.bilka.basket.domain.basketcrud.repository.BasketReposit
 @Configuration
 public class BasketCrudConfiguration {
     @Bean
-    public IProductRestTemplate productRestTemplate() {
-        return _-> null;
-    }
-
-    @Bean
     public BasketCrudFacade basketCrudFacade(
             BasketRepository basketRepository,
             BasketItemRepository basketItemRepository,

@@ -12,6 +12,7 @@ import pl.networkmanager.bilka.basket.domain.basketcrud.repository.BasketReposit
 import pl.networkmanager.bilka.basket.domain.dto.BasketDto;
 
 import java.math.BigDecimal;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -40,10 +41,9 @@ public class BasketCrudFacade {
         if (basket == null) {
             return new ArrayList<>();
         }
-        try {
-            return basketItemRepository.findBasketItemsByBasket(basket).stream()
-                    .map(item -> {
-
+        return basketItemRepository.findBasketItemsByBasket(basket).stream()
+                .map(item -> {
+                            try {
                                 Product product = productRestTemplate.getProduct(item.getProduct());
                                 return BasketItemDto.builder()
                                         .uuid(item.getUuid())
@@ -53,13 +53,13 @@ public class BasketCrudFacade {
                                         .price(product.getPrice())
                                         .totalPrice(product.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
                                         .build();
-                            }
-                    )
-                    .collect(Collectors.toList());
-        } catch (Exception e) {
-            throw new RuntimeException("Product not found");
-        }
 
+                            } catch (URISyntaxException e) {
+                                throw new RuntimeException("Product not found");
+                            }
+                        }
+                )
+                .collect(Collectors.toList());
     }
 
     public BasketDto createBasket() {
@@ -72,21 +72,26 @@ public class BasketCrudFacade {
     }
 
     public void addProductToBasket(BasketDto basketDto, BasketItemAddDto basketItemAddDTO) {
-        BasketItems basketItems = new BasketItems();
-        Basket basket = basketRepository.findByUuid(basketDto.uuid()).orElse(null);
+        try {
 
-        Product product = productRestTemplate.getProduct(basketItemAddDTO.product());
-        if (product != null && basket != null) {
-            basketItemRepository.findByBasketUuidAndProduct(basketDto.uuid(), product.getUuid()).ifPresentOrElse(basketItems1 -> {
-                basketItems1.setQuantity(basketItems1.getQuantity() + basketItemAddDTO.quantity());
-                basketItemRepository.save(basketItems1);
-            }, () -> {
-                basketItems.setBasket(basket);
-                basketItems.setUuid(UUID.randomUUID().toString());
-                basketItems.setQuantity(basketItemAddDTO.quantity());
-                basketItems.setProduct(product.getUuid());
-                basketItemRepository.save(basketItems);
-            });
+            BasketItems basketItems = new BasketItems();
+            Basket basket = basketRepository.findByUuid(basketDto.uuid()).orElse(null);
+
+            Product product = productRestTemplate.getProduct(basketItemAddDTO.product());
+            if (product != null && basket != null) {
+                basketItemRepository.findByBasketUuidAndProduct(basketDto.uuid(), product.getUuid()).ifPresentOrElse(basketItems1 -> {
+                    basketItems1.setQuantity(basketItems1.getQuantity() + basketItemAddDTO.quantity());
+                    basketItemRepository.save(basketItems1);
+                }, () -> {
+                    basketItems.setBasket(basket);
+                    basketItems.setUuid(UUID.randomUUID().toString());
+                    basketItems.setQuantity(basketItemAddDTO.quantity());
+                    basketItems.setProduct(product.getUuid());
+                    basketItemRepository.save(basketItems);
+                });
+            }
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Product not found");
         }
     }
 
