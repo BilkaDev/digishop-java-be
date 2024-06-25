@@ -1,4 +1,4 @@
-package pl.networkmanager.bilka.basket.infrastructure.producthttp;
+package pl.networkmanager.bilka.basket.infrastructure;
 
 import pl.networkmanager.bilka.basket.domain.basketcrud.dto.BasketItemAddDto;
 import pl.networkmanager.bilka.basket.domain.basketcrud.dto.BasketItemDto;

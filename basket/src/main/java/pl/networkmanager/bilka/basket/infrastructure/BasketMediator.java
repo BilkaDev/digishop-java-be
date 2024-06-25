@@ -12,7 +12,6 @@ import pl.networkmanager.bilka.basket.domain.basketcrud.dto.BasketDto;
 import pl.networkmanager.bilka.basket.domain.basketcrud.dto.BasketItemDto;
 import pl.networkmanager.bilka.basket.infrastructure.dto.BasketItemAddRequestDto;
 import pl.networkmanager.bilka.basket.infrastructure.dto.ListBasketItemResponseDto;
-import pl.networkmanager.bilka.basket.infrastructure.producthttp.BasketMapper;
 
 import java.util.ArrayList;
 import java.util.List;
